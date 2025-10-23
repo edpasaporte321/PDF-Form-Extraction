@@ -2,6 +2,33 @@ from spire.pdf.common import *
 from spire.pdf import *
 import FreeSimpleGUI as sg
 
+def creatingTheWindow():
+    # Define the window's contents
+    layout = [[sg.Text("Input file name (with .pdf extension):")],
+            [sg.Input(key='formFileName')],
+            [sg.Text(size=(40,1), key='output')],
+            [sg.Button('Extract'), sg.Button('Cancel')]]
+
+    # Create the window
+    window = sg.Window('PDF Field Name Extractor', layout)
+
+    # Display and interact with the Window using an Event Loop
+    while True:
+        event, values = window.read()
+        # See if user wants to quit or window was closed
+        if event == sg.WINDOW_CLOSED or event == 'Cancel':
+            break
+        # Output a message to the window
+        try:
+            extractingFieldNames(values['formFileName'])
+        except:
+            window['output'].update('Incorrect File Name, or file not present in directory.')
+        else:
+            window['output'].update('Field names extracted successfully! Check output.txt.')
+
+    # Finish up by removing from the screen
+    window.close()
+
 def separateTextByAngleBrackets(text):
     """Separates text by angle brackets and returns a list of the separated items.
      Args:
@@ -64,7 +91,6 @@ def extractingFieldNames(pdfFileName):
 
         if len(nowItsAList) == 1:
             resultOfSanitizingTextAlone = nowItsAList[0] #getting the only item in the list
-            print(f"[{sanitizingText(resultOfSanitizingTextAlone)}]")
             file1.write(f"[{sanitizingText(resultOfSanitizingTextAlone)}]\n")
 
         elif len(nowItsAList) > 1:
@@ -72,9 +98,10 @@ def extractingFieldNames(pdfFileName):
                 resultOfSanitizingText = sanitizingText(item) #sanitizing each item in the list
                 if resultOfSanitizingText != "":
                     file1.write(f"[{resultOfSanitizingText}]\n")
-                    print({resultOfSanitizingText})
 
                 elif resultOfSanitizingText == "":
                     pass
 
     file1.close()
+
+creatingTheWindow()
