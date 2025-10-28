@@ -1,18 +1,7 @@
-[DefendantAddressStreetTE]
-[DefendantAddressCszCO]
-[DefendantTelephoneTE]
-[PlaintiffAddressCszCO]
-[PlaintiffAddressStreetTE]
-[PlaintiffTelephoneTE]
-[PlaintiffNameTE]
-[DefendantNameTE]
-[CourtDivisionTE]
-[CourtDocketNumberTE]
-[AttorneyPreparingNoticeTF]
-[PlaintiffNameTE]
-[AttorneyOrPlaintiffAddressPhoneCO]
-[AttorneyOrPlaintiffNameCO]
-[CourtType5MC]
-[CourtType5MC]
-[NoticeDismissalTypeMC]
-[NoticeDismissalTypeMC]
+[DefendantAddressStreetTE] [DefendantAddressCszCO] [DefendantTelephoneTE] [PlaintiffAddressCszCO] [PlaintiffAddressStreetTE] [PlaintiffTelephoneTE] [PlaintiffNameTE] [DefendantNameTE] [CourtDivisionTE] [CourtDocketNumberTE] [AttorneyPreparingNoticeTF] [PlaintiffNameTE] [AttorneyOrPlaintiffAddressPhoneCO] [AttorneyOrPlaintiffNameCO] [CourtType5MC] [CourtType5MC] [NoticeDismissalTypeMC] [NoticeDismissalTypeMC] 
+==========END OF EXTRACTED VARIABLES==========
+
+
+Warning: The following variables are duplicated in the PDF Form and may need to be altered before automation begins:
+
+[]
