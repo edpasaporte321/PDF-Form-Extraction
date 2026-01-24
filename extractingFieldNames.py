@@ -85,28 +85,22 @@ def getFields(fileNamePDF):
         if not ("TE" in newString or "MC" in newString or "TF" in newString or "NU" in newString or "CO" in newString or "DA" in newString):
             numberOfNoVariable += 1
             pass
-        
-
-    # print(f"Number of TE fields: {numberOfTE}")
-    # print(f"Number of MC fields: {numberOfMC}")
-    # print(f"Number of TF fields: {numberOfTF}")
-    # print(f"Number of NU fields: {numberOfNU}")
-    # print(f"Number of CO fields: {numberOfCO}")
-    # print(f"Number of DA fields: {numberOfDA}")
 
     return len(listOfKeys), numberOfTE, numberOfMC, numberOfTF, numberOfNU, numberOfCO, numberOfDA, numberOfNoVariable
 
 
 def readAndWriteToCSV(pdfFileName):
-    data = pd.read_csv('Extracted.csv')
-    df = pd.DataFrame(data)
-    #print(df)
 
-    df.loc[len(df)] = [pdfFileName, getFields(pdfFileName)[0], getFields(pdfFileName)[1], getFields(pdfFileName)[2], getFields(pdfFileName)[3], getFields(pdfFileName)[4], getFields(pdfFileName)[5], getFields(pdfFileName)[6], getFields(pdfFileName)[7]]
-
-    df.to_csv('Extracted.csv', index=False)
-
-
+    try:
+        data = pd.read_csv('Extracted.csv')
+        df = pd.DataFrame(data)
+        df.loc[len(df)] = [pdfFileName, getFields(pdfFileName)[0], getFields(pdfFileName)[1], getFields(pdfFileName)[2], getFields(pdfFileName)[3], getFields(pdfFileName)[4], getFields(pdfFileName)[5], getFields(pdfFileName)[6], getFields(pdfFileName)[7]]
+        df.to_csv('Extracted.csv', index=False)
+    except:
+        return False
+    else:
+        pass
+        
 def extractingFieldNames(pdfFileName):
     """Extracts field names from a PDF form and writes them to an output file."""
     doc = PdfDocument()
@@ -114,30 +108,35 @@ def extractingFieldNames(pdfFileName):
 
     form = doc.Form
     formWidget = PdfFormWidget(form)
-    field = formWidget.FieldsWidget.get_Item(0)
-    textbox = PdfTextBoxFieldWidget(field.Ptr)
+    try:
+        field = formWidget.FieldsWidget.get_Item(0)
+    except:
+        return False
+    else:
+        
+        textbox = PdfTextBoxFieldWidget(field.Ptr)
 
-    file1 = open("output.txt", "w")
-    
-    for i in range(formWidget.FieldsWidget.Count):
-        field = formWidget.FieldsWidget.get_Item(i)
-        textbox = PdfTextBoxFieldWidget(field.Ptr) #declaring the textbox variable and field variable
-        beforeBracketedText = textbox.Name #getting bracketed text
-        toBeCleaned = beforeBracketedText #assigning bracketed text to a new variable for cleaning
-        nowItsAList = separateTextByAngleBrackets(toBeCleaned) #removing angle brackets. output is a list
+        file1 = open("output.txt", "w")
+        
+        for i in range(formWidget.FieldsWidget.Count):
+            field = formWidget.FieldsWidget.get_Item(i)
+            textbox = PdfTextBoxFieldWidget(field.Ptr) #declaring the textbox variable and field variable
+            beforeBracketedText = textbox.Name #getting bracketed text
+            toBeCleaned = beforeBracketedText #assigning bracketed text to a new variable for cleaning
+            nowItsAList = separateTextByAngleBrackets(toBeCleaned) #removing angle brackets. output is a list
 
-        if len(nowItsAList) == 1:
-            resultOfSanitizingTextAlone = nowItsAList[0] #getting the only item in the list
-            file1.write(f"[{sanitizingText(resultOfSanitizingTextAlone)}]\n")
+            if len(nowItsAList) == 1:
+                resultOfSanitizingTextAlone = nowItsAList[0] #getting the only item in the list
+                file1.write(f"[{sanitizingText(resultOfSanitizingTextAlone)}]\n")
 
-        elif len(nowItsAList) > 1:
-            for item in nowItsAList:
-                resultOfSanitizingText = sanitizingText(item) #sanitizing each item in the list
-                if resultOfSanitizingText != "":
-                    file1.write(f"[{resultOfSanitizingText}]\n")
+            elif len(nowItsAList) > 1:
+                for item in nowItsAList:
+                    resultOfSanitizingText = sanitizingText(item) #sanitizing each item in the list
+                    if resultOfSanitizingText != "":
+                        file1.write(f"[{resultOfSanitizingText}]\n")
 
-                elif resultOfSanitizingText == "":
-                    pass
+                    elif resultOfSanitizingText == "":
+                        pass
 
     file1.close()
 
@@ -161,21 +160,28 @@ def creatingTheWindow():
         if event == 'Get Variables':
             try:
                 extractingFieldNames(values['formFileName'])
+                testClauseNoFormFields = extractingFieldNames
+                if testClauseNoFormFields(values['formFileName']) == False:
+                    window['output'].update('No form fields found in the PDF. Please check the file.')
+                    pass
+                elif testClauseNoFormFields(values['formFileName']) != False:
+                    window['output'].update('Field names extracted successfully! Check output.txt.')
+                    pass
             except:
-                window['output'].update('Incorrect File Name, or file not present in directory.')
-            else:
-                window['output'].update('Field names extracted successfully! Check output.txt.')
-        
+               window['output'].update('Incorrect File Name, or file not present in directory.')
+               pass
+
         if event == 'Extract Report':
             try:
-                readAndWriteToCSV(values['formFileName'])
+                if readAndWriteToCSV(values['formFileName']) == False:
+                    window['output'].update('No form fields found in the PDF. Please check the file.')
+                    pass
+                else:
+                    window['output'].update('Report extracted successfully! Check Extracted.csv.')
             except:
                 window['output'].update('Incorrect File Name, or file not present in directory.')
-            else:
-                window['output'].update('Report extracted successfully! Check Extracted.csv.')
-
+            
     # Finish up by removing from the screen
     window.close()
 
 creatingTheWindow()
-
